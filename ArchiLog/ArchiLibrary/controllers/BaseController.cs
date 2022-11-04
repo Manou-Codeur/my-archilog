@@ -1,5 +1,6 @@
 ﻿using ArchiLibrary.Data;
 using ArchiLibrary.Models;
+using ArchiLibrary.Params;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,15 +16,40 @@ namespace ArchiLibrary.controllers
     {
         protected readonly TContext _context;
 
+        public int numberPerPage = 10;
+
         public BaseController(TContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<TModel>> GetAll()
+        public async Task<IEnumerable<TModel>> GetAll([FromQuery] BaseParams param)
         {
-            return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
+            var query = await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
+
+            if (param.Range == null && param.Rel == null)
+            {
+                return query;
+            }
+
+            string[] table = param.Range.Split('-');
+            int start = int.Parse(table[0]);
+            int end = int.Parse(table[1]);
+
+            int toTake = (end - start) + 1;
+            int toSkip = start - 1;
+            if (start == 0 || start == 1)
+            {
+                toSkip = 0;
+            }
+
+            //http headers
+            var unit = Request.Path.ToString().Split('/')[2];
+            Response.Headers.Add("Content-Range", param.Range + "/" + query.Count);
+            Response.Headers.Add("Accept-Range", unit + " " + query.Count);
+
+            return query.Take(toTake).Skip(toSkip);
         }
 
         [HttpGet("{id}")]// /api/{item}/3
