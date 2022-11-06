@@ -11,7 +11,5 @@ namespace ArchiLibrary.Params
         public string? Range { get; set; }
         public string? Asc { get; set; }
         public string? Dec { get; set; }
-
-        public string? Rel { get; set; }
     }
 }

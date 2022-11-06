@@ -1,4 +1,5 @@
-﻿using ArchiLibrary.Data;
+﻿using ArchiLibrary.Pagination;
+using ArchiLibrary.Data;
 using ArchiLibrary.Models;
 using ArchiLibrary.Params;
 using Microsoft.AspNetCore.Mvc;
@@ -16,40 +17,49 @@ namespace ArchiLibrary.controllers
     {
         protected readonly TContext _context;
 
-        public int numberPerPage = 10;
-
         public BaseController(TContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<TModel>> GetAll([FromQuery] BaseParams param)
+        public async Task<ActionResult<IEnumerable<TModel>>> GetAll([FromQuery] BaseParams param)
         {
+            const int maxRange = 3;
+
             var query = await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
 
-            if (param.Range == null && param.Rel == null)
+            if (param.Range == null)
             {
                 return query;
             }
 
+            //if param exists
             string[] table = param.Range.Split('-');
             int start = int.Parse(table[0]);
             int end = int.Parse(table[1]);
 
+            if (start == 0) start = 1;
+
             int toTake = (end - start) + 1;
             int toSkip = start - 1;
-            if (start == 0 || start == 1)
+
+            var unit = Request.Path.ToString().Split('/')[2];
+
+            if (toTake > maxRange)
             {
-                toSkip = 0;
+                return BadRequest($"Max range is {maxRange} {unit}, but you asked for {toTake}.");
             }
 
-            //http headers
-            var unit = Request.Path.ToString().Split('/')[2];
-            Response.Headers.Add("Content-Range", param.Range + "/" + query.Count);
-            Response.Headers.Add("Accept-Range", unit + " " + query.Count);
+            var obj = new PaginationUtil(query.Count, toTake, start, end, unit);
 
-            return query.Take(toTake).Skip(toSkip);
+            //http headers
+            Response.Headers.Add("Content-Range", param.Range + "/" + query.Count);
+            Response.Headers.Add("Accept-Range", unit + " " + maxRange);
+            Response.Headers.Add("Links", $"next: {obj.next}, prev: {obj.prev}, first: {obj.first}, last: {obj.last}");
+
+
+            return query.Skip(toSkip).Take(toTake).ToList();
         }
 
         [HttpGet("{id}")]// /api/{item}/3

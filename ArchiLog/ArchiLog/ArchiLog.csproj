@@ -21,4 +21,8 @@
     <ProjectReference Include="..\ArchiLibrary\ArchiLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

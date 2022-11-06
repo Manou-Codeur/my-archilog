@@ -1,8 +1,11 @@
 ﻿using ArchiLibrary.controllers;
+using ArchiLibrary.Params;
 using ArchiLog.Data;
 using ArchiLog.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
+using System.Collections.Generic;
 
 namespace ArchiLog.Controllers
 {
@@ -13,8 +16,5 @@ namespace ArchiLog.Controllers
         public BrandsController(ArchiLogDbContext context):base(context)
         {
         }
-
-        
-
     }
 }
