@@ -8,17 +8,17 @@ namespace ArchiLog.Controllers
 {
     [ApiController]
     [Route("api/[controller]/v{version:apiVersion}")]
-    [ApiVersion("1.0")]
-    public class BrandsController : BaseController<ArchiLogDbContext, Brand>
+    [ApiVersion("2.0")]
+    public class BrandsControllerV2 : BaseController<ArchiLogDbContext, Brand>
     {
-        public BrandsController(ArchiLogDbContext context):base(context)
+        public BrandsControllerV2(ArchiLogDbContext context) : base(context)
         {
         }
 
         [HttpGet()]
         public async Task<IEnumerable<Brand>> GetAll()
         {
-            return await _context.Brands.Where(x => x.Active).ToListAsync();
+            return await _context.Brands.Where(x => x.Active).Skip(1).ToListAsync();
         }
 
 

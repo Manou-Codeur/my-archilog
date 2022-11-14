@@ -23,11 +23,11 @@ namespace ArchiLibrary.controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IEnumerable<TModel>> GetAll()
-        {
-            return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
-        }
+        //[HttpGet]
+        //public async Task<IEnumerable<TModel>> GetAll()
+        //{
+        //    return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
+        //}
 
         [HttpGet("{id}")]// /api/{item}/3
         public async Task<ActionResult<TModel>> GetById([FromRoute] int id)
