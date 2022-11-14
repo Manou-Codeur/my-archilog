@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 
 namespace ArchiLibrary.controllers
 {
+
     [ApiController]
+    [Route("api/[controller]/v{version:apiVersion}")]
     public abstract class BaseController<TContext, TModel> : ControllerBase where TContext : BaseDbContext where TModel : BaseModel
     {
         protected readonly TContext _context;
@@ -23,14 +25,14 @@ namespace ArchiLibrary.controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //public async Task<IEnumerable<TModel>> GetAll()
-        //{
-        //    return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
-        //}
+        [HttpGet]
+        virtual public async Task<IEnumerable<TModel>> GetAll()
+        {
+            return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
+        }
 
         [HttpGet("{id}")]// /api/{item}/3
-        public async Task<ActionResult<TModel>> GetById([FromRoute] int id)
+        virtual public async Task<ActionResult<TModel>> GetById([FromRoute] int id)
         {
             var item = await _context.Set<TModel>().SingleOrDefaultAsync(x => x.ID == id);
             if (item == null || !item.Active)
@@ -39,7 +41,7 @@ namespace ArchiLibrary.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostItem([FromBody] TModel item)
+        virtual public async Task<IActionResult> PostItem([FromBody] TModel item)
         {
             item.Active = true;
             await _context.AddAsync(item);
@@ -49,7 +51,7 @@ namespace ArchiLibrary.controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<TModel>> PutItem([FromRoute] int id, [FromBody] TModel item)
+        virtual public async Task<ActionResult<TModel>> PutItem([FromRoute] int id, [FromBody] TModel item)
         {
             if (id != item.ID)
                 return BadRequest();
@@ -64,7 +66,7 @@ namespace ArchiLibrary.controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<TModel>> DeleteItem([FromRoute] int id)
+        virtual public async Task<ActionResult<TModel>> DeleteItem([FromRoute] int id)
         {
             var item = await _context.Set<TModel>().FindAsync(id);
             if (item == null)
