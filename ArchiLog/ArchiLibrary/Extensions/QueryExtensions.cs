@@ -12,22 +12,38 @@ namespace ArchiLibrary.Extensions
     public static class QueryExtensions
     {
 
+        private static Expression<Func<TModel, object>> SortingLambda<TModel> (string Champ)
+        {
+            string champ = Champ;
+
+            //créer lambda
+            var parameter = Expression.Parameter(typeof(TModel), "x");
+            var property = Expression.Property(parameter, champ);
+
+            var o = Expression.Convert(property, typeof(object));
+            var lambda = Expression.Lambda<Func<TModel, object>>(o, parameter);
+            return lambda;
+        } 
+
         public static IOrderedQueryable<TModel> Sort<TModel>(this IQueryable<TModel> query, BaseParams p)
         {
-            if (!string.IsNullOrWhiteSpace(p.Asc))
+            if (!string.IsNullOrWhiteSpace(p.Asc) && !string.IsNullOrWhiteSpace(p.Dec))
             {
-                string champ = p.Asc;
+                var lambda = SortingLambda<TModel>(p.Asc);
+                var lambda2 = SortingLambda<TModel>(p.Dec);
 
-                //créer lambda
-                var parameter = Expression.Parameter(typeof(TModel), "x");
-                var property = Expression.Property(parameter, champ/*"Name"*/);
+                return query.OrderBy(lambda).ThenByDescending(lambda2);
+            }
+            else if (!string.IsNullOrWhiteSpace(p.Asc))
+            {
+                var lambda = SortingLambda<TModel>(p.Asc);
 
-                var o = Expression.Convert(property, typeof(object));
-                var lambda = Expression.Lambda<Func<TModel, object>>(o, parameter);
-
-                //utilisation lambda
                 return query.OrderBy(lambda);
-                //return query.OrderBy(x => x.Name);
+            }else if (!string.IsNullOrWhiteSpace(p.Dec))
+            {
+                var lambda = SortingLambda<TModel>(p.Dec);
+
+                return query.OrderByDescending(lambda);
             }
             else
                 return (IOrderedQueryable<TModel>)query;

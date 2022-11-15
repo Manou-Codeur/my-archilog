@@ -4,6 +4,7 @@ using ArchiLibrary.Params;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ArchiLibrary.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,9 @@ namespace ArchiLibrary.controllers
         }
 
         [HttpGet]
-        virtual public async Task<IEnumerable<TModel>> GetAll()
+        virtual public async Task<IEnumerable<TModel>> GetAll([FromQuery] BaseParams param)
         {
-            return await _context.Set<TModel>().Where(x => x.Active).ToListAsync();
+            return await _context.Set<TModel>().Where(x => x.Active).Sort(param).ToListAsync();
         }
 
         [HttpGet("{id}")]// /api/{item}/3

@@ -1,4 +1,5 @@
 ﻿using ArchiLibrary.controllers;
+using ArchiLibrary.Params;
 using ArchiLog.Data;
 using ArchiLog.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace ArchiLog.Controllers.V2
         }
 
         [HttpGet()]
-        override public async Task<IEnumerable<Brand>> GetAll()
+        override public async Task<IEnumerable<Brand>> GetAll([FromQuery] BaseParams param)
         {
             return await _context.Brands.Where(x => x.Active).Skip(4).ToListAsync();
         }
