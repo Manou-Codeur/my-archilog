@@ -10,7 +10,7 @@ namespace ArchiLog.Controllers.V2
     [ApiVersion("2.0")]
     public class BrandsController : BaseController<ArchiLogDbContext, Brand>
     {
-        public BrandsController(ArchiLogDbContext context) : base(context)
+        public BrandsController(ArchiLogDbContext context, ILogger<BaseController<ArchiLogDbContext, Brand>> logger) : base(context, logger)
         {
         }
 

@@ -3,6 +3,7 @@ using ArchiLibrary.Models;
 using ArchiLibrary.Params;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +18,14 @@ namespace ArchiLibrary.controllers
     public abstract class BaseController<TContext, TModel> : ControllerBase where TContext : BaseDbContext where TModel : BaseModel
     {
         protected readonly TContext _context;
+        private readonly ILogger<BaseController<TContext, TModel>> _logger;
 
         public int numberPerPage = 10;
 
-        public BaseController(TContext context)
+        public BaseController(TContext context, ILogger<BaseController<TContext, TModel>> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
